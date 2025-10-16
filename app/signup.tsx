@@ -152,13 +152,13 @@ export default function SignupScreen() {
 
         case "code":
           await validateField("code");
-          if (values.code.trim().length === 4) {
+          if (values.code.trim().length === 4 && values.code === "1234") {
             // Register user with static verification code
             const response = await authAPI.register({
               username: values.username,
               password: values.password,
               mail: values.mail,
-              code: "1234", // Static verification code
+              code: values.code, // Static verification code
             });
 
             if (response.data.success) {
@@ -176,6 +176,8 @@ export default function SignupScreen() {
             } else {
               setErrorMessage("Registration failed. Please try again.");
             }
+          }else{
+            setErrorMessage("Invalid verification code");
           }
           break;
       }
