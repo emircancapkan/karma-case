@@ -294,6 +294,10 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 14,
     color: '#7C3AED',
+    backgroundColor: '#EDE9FE',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   tabs: {
     flexDirection: 'row',
@@ -301,14 +305,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     backgroundColor: '#F3F4F6',
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 4,
   },
   tab: {
     flex: 1,
     paddingVertical: 10,
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 20,
   },
   tabActive: {
     backgroundColor: '#FFFFFF',
