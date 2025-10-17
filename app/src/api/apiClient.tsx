@@ -1,8 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-// Base URL Configuration - from .env file
-// IMPORTANT: Expo requires EXPO_PUBLIC_ prefix for client-side environment variables
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // Create axios instance
@@ -14,11 +12,10 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request Interceptor - Add auth token if available
 apiClient.interceptors.request.use(
   async (config) => {
     try {
-      // Skip auth for login/register/check endpoints
+
       const publicEndpoints = ['/auth/login', '/auth/register', '/auth/check-username', '/auth/check-mail'];
       const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
       
@@ -61,9 +58,6 @@ apiClient.interceptors.response.use(
       // Handle 401 Unauthorized
       if (error.response.status === 401) {
         console.log('401 Unauthorized - Token might be invalid or missing');
-        // Optionally clear token and redirect to login
-        // await AsyncStorage.removeItem('authToken');
-        // await AsyncStorage.removeItem('userData');
       }
     } else if (error.request) {
       // Request was made but no response received
@@ -101,22 +95,18 @@ export interface CheckMailRequest {
 }
 
 export const authAPI = {
-  // POST /auth/login - Login user
   login: (data: LoginRequest): Promise<AxiosResponse> => {
     return apiClient.post('/auth/login', data);
   },
 
-  // POST /auth/register - Register user
   register: (data: RegisterRequest): Promise<AxiosResponse> => {
     return apiClient.post('/auth/register', data);
   },
 
-  // POST /auth/check-username - Check username availability
   checkUsername: (data: CheckUsernameRequest): Promise<AxiosResponse> => {
     return apiClient.post('/auth/check-username', data);
   },
 
-  // POST /auth/check-mail - Check email
   checkMail: (data: CheckMailRequest): Promise<AxiosResponse> => {
     return apiClient.post('/auth/check-mail', data);
   },
@@ -129,7 +119,7 @@ export const authAPI = {
 export interface UpdateUserRequest {
   username?: string;
   mail?: string;
-  profileImage?: string;
+  password?: string;
 }
 
 export const userAPI = {
@@ -143,9 +133,6 @@ export const userAPI = {
     return apiClient.delete('/user/delete');
   },
 
-  // POST /user/purchase - Purchase premium account
-  // Upgrades user to premium status
-  // No parameters required - just call the endpoint
   purchase: (): Promise<AxiosResponse> => {
     return apiClient.post('/user/purchase');
   },
@@ -156,10 +143,10 @@ export const userAPI = {
 // ============================================
 
 export interface UploadImageRequest {
-  file: any; // File to upload (binary)
+  file: any; // File upload 
   latitude: number; // Location latitude
   longitude: number; // Location longitude
-  prompt: string; // AI generation prompt
+  prompt: string; // prompt
 }
 
 export interface GetImagesParams {
@@ -171,9 +158,6 @@ export interface GetImagesParams {
 }
 
 export const imageAPI = {
-  // POST /image/upload - Upload image with location and AI prompt
-  // User uploads a photo, enters a prompt, and AI generates an image
-  // The image is shared with location data and appears on the map
   upload: (data: UploadImageRequest | FormData, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
     return apiClient.post('/image/upload', data, {
       ...config,
@@ -184,8 +168,6 @@ export const imageAPI = {
     });
   },
 
-  // GET /image - Get images (for map display and discovery)
-  // Returns images with their locations to display on the map
   getImages: (params?: GetImagesParams): Promise<AxiosResponse> => {
     return apiClient.get('/image', { params });
   },
@@ -196,8 +178,7 @@ export const imageAPI = {
 // ============================================
 
 export interface FriendRequestRequest {
-  friendId: string;
-  username?: string;
+  targetUserId: string;
 }
 
 export interface DeleteFriendRequest {
@@ -205,26 +186,22 @@ export interface DeleteFriendRequest {
 }
 
 export interface AcceptFriendRequest {
-  requestId: string;
+  friendId: string;
 }
 
 export const friendAPI = {
-  // POST /friend/request - Request friend
   request: (data: FriendRequestRequest): Promise<AxiosResponse> => {
     return apiClient.post('/friend/request', data);
   },
 
-  // DELETE /friend/delete - Delete friend request
   delete: (data: DeleteFriendRequest): Promise<AxiosResponse> => {
     return apiClient.delete('/friend/delete', { data });
   },
 
-  // POST /friend/accept - Accept friend request
   accept: (data: AcceptFriendRequest): Promise<AxiosResponse> => {
     return apiClient.post('/friend/accept', data);
   },
 
-  // GET /friend - Get friends
   getFriends: (params?: any): Promise<AxiosResponse> => {
     return apiClient.get('/friend', { params });
   },
@@ -235,13 +212,13 @@ export const friendAPI = {
 // ============================================
 
 export interface ExploreRequest {
-  latitude?: number; // User's current latitude
-  longitude?: number; // User's current longitude
-  radius?: number; // Search radius in km (default from filter slider)
+  latitude?: number; 
+  longitude?: number; 
+  radius?: number; 
   page?: number;
   limit?: number;
   filters?: {
-    userId?: string; // Filter by specific user
+    userId?: string; 
     dateRange?: {
       start?: string;
       end?: string;
@@ -251,7 +228,6 @@ export interface ExploreRequest {
 
 export const exploreAPI = {
   // POST /explore - Explore nearby images on the map
-  // Returns images within the specified radius to display on the map
   explore: (data: ExploreRequest): Promise<AxiosResponse> => {
     return apiClient.post('/explore', data);
   },

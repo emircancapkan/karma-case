@@ -38,7 +38,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="discover"
+        name="discoverScreen"
         options={{
           title: 'Discover',
           tabBarIcon: ({ color, focused }) => (
@@ -51,8 +51,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="profileScreen"
         options={{
+          headerShown: false,
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons 
