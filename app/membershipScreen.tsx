@@ -11,7 +11,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { userAPI } from "./src/api/apiClient";
 import * as WebBrowser from "expo-web-browser";
