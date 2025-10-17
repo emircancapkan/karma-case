@@ -47,9 +47,20 @@ export const useAuth = () => {
     try {
       const response = await api.auth.register(credentials);
       
+      console.log('🔐 Signup API Response:', response.data);
+      
       if (response.data.success) {
         const { token, user } = response.data.data;
-        await login(user, token);
+        
+        // Ensure mail field is set (handle both 'mail' and 'email' field names)
+        const userData = {
+          ...user,
+          mail: user.mail || user.email || credentials.mail,
+        };
+        
+        console.log('👤 User data to be stored:', userData);
+        
+        await login(userData, token);
         showSuccess(SUCCESS_MESSAGES.signupSuccess);
         navigation.reset({
           index: 0,

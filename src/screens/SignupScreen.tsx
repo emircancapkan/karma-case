@@ -1,8 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
+  Pressable,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -47,6 +49,7 @@ export const SignupScreen: React.FC = React.memo(() => {
   const { signup, checkUsername, checkEmail, isLoading } = useAuth();
   const [step, setStep] = useState<SignupStep>('username');
   const [errorMessage, setErrorMessage] = useState('');
+  const codeInputRef = useRef<TextInput>(null);
 
   const initialValues: SignupFormValues = {
     username: '',
@@ -172,71 +175,88 @@ export const SignupScreen: React.FC = React.memo(() => {
               ) : null}
 
               {/* Input Field */}
-              <View style={styles.inputContainer}>
-                {step === 'username' && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                    <Text style={styles.atSymbol}>@</Text>
-                    <Input
-                      value={values.username}
-                      onChangeText={handleChange('username')}
-                      onBlur={handleBlur('username')}
-                      placeholder="username"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      autoFocus
-                      onSubmitEditing={() => handleContinue(values, validateField)}
-                      containerStyle={styles.inputWrapper}
-                      style={styles.input}
-                    />
-                  </View>
-                )}
-                {step === 'password' && (
-                  <Input
+              {step === 'username' ? (
+                <View style={styles.usernameContainer}>
+                  <Text style={styles.atSymbol}>@</Text>
+                  <TextInput
+                    value={values.username}
+                    onChangeText={handleChange('username')}
+                    onBlur={handleBlur('username')}
+                    placeholder="username"
+                    placeholderTextColor={colors.textPlaceholder}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoFocus
+                    onSubmitEditing={() => handleContinue(values, validateField)}
+                    style={styles.usernameInput}
+                  />
+                </View>
+              ) : step === 'password' ? (
+                <View style={styles.passwordContainer}>
+                  <TextInput
                     value={values.password}
                     onChangeText={handleChange('password')}
                     onBlur={handleBlur('password')}
                     placeholder="Enter your password"
+                    placeholderTextColor={colors.textPlaceholder}
                     secureTextEntry
                     autoCapitalize="none"
                     autoCorrect={false}
                     autoFocus
                     onSubmitEditing={() => handleContinue(values, validateField)}
-                    containerStyle={styles.inputWrapper}
-                    style={styles.input}
+                    style={styles.passwordInput}
                   />
-                )}
-                {step === 'mailVerification' && (
-                  <Input
+                </View>
+              ) : step === 'mailVerification' ? (
+                <View style={styles.emailContainer}>
+                  <TextInput
                     value={values.mail}
                     onChangeText={handleChange('mail')}
                     onBlur={handleBlur('mail')}
                     placeholder="Enter your email"
+                    placeholderTextColor={colors.textPlaceholder}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
                     autoFocus
                     onSubmitEditing={() => handleContinue(values, validateField)}
-                    containerStyle={styles.inputWrapper}
-                    style={styles.input}
+                    style={styles.emailInput}
                   />
-                )}
-                {step === 'code' && (
-                  <Input
+                </View>
+              ) : step === 'code' ? (
+                <Pressable 
+                  style={styles.codeContainer}
+                  onPress={() => codeInputRef.current?.focus()}
+                >
+                  <View style={styles.otpBoxesContainer}>
+                    {[0, 1, 2, 3].map((index) => (
+                      <View key={index} style={styles.otpBox}>
+                        <Text style={styles.otpBoxText}>
+                          {values.code[index] || ''}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                  <TextInput
+                    ref={codeInputRef}
                     value={values.code}
-                    onChangeText={handleChange('code')}
+                    onChangeText={(text) => {
+                      // Only accept numbers and max 4 digits
+                      const numericText = text.replace(/[^0-9]/g, '').slice(0, 4);
+                      handleChange('code')(numericText);
+                    }}
                     onBlur={handleBlur('code')}
-                    placeholder="1234"
                     keyboardType="number-pad"
                     maxLength={4}
                     autoCapitalize="none"
                     autoCorrect={false}
                     autoFocus
                     onSubmitEditing={() => handleContinue(values, validateField)}
-                    containerStyle={styles.inputWrapper}
-                    style={styles.input}
+                    style={styles.hiddenInput}
+                    caretHidden={false}
                   />
-                )}
-              </View>
+                </Pressable>
+              ) : null}
             </View>
 
             {/* Continue Button */}
@@ -307,12 +327,75 @@ const styles = StyleSheet.create({
     marginTop: 100,
     width: '100%',
   },
+  usernameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary,
+    paddingBottom: spacing.sm,
+    marginTop: 100,
+    width: '100%',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary,
+    paddingBottom: spacing.sm,
+    marginTop: 100,
+    width: '100%',
+  },
+  emailContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary,
+    paddingBottom: spacing.sm,
+    marginTop: 100,
+    width: '100%',
+  },
+  codeContainer: {
+    alignItems: 'center',
+    marginTop: 100,
+    width: '100%',
+  },
+  otpBoxesContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.lg,
+  },
+  otpBox: {
+    width: 56,
+    height: 70,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  otpBoxText: {
+    fontSize: 32,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  hiddenInput: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0,
+    fontSize: 1,
+  },
   atSymbol: {
     ...typography.body,
     fontSize: 18,
     color: colors.textPrimary,
     fontWeight: '500',
-    marginLeft: '35%',
     marginRight: spacing.xs / 2,
   },
   inputWrapper: {
@@ -322,7 +405,33 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 18,
     paddingVertical: spacing.sm,
-    textAlign: 'justify',
+    textAlign: 'center',
+  },
+  usernameInput: {
+    fontSize: 18,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: 0,
+    textAlign: 'left',
+    backgroundColor: 'transparent',
+    color: colors.textPrimary,
+  },
+  passwordInput: {
+    fontSize: 18,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: 0,
+    textAlign: 'center',
+    backgroundColor: 'transparent',
+    color: colors.textPrimary,
+    width: '100%',
+  },
+  emailInput: {
+    fontSize: 18,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: 0,
+    textAlign: 'center',
+    backgroundColor: 'transparent',
+    color: colors.textPrimary,
+    width: '100%',
   },
   buttonContainer: {
     paddingHorizontal: spacing.xl,

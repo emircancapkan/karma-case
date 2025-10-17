@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -101,39 +102,39 @@ export const LoginScreen: React.FC = React.memo(() => {
               ) : null}
 
               {/* Input Field */}
-              <View style={styles.inputContainer}>
-                {step === 'username' ? (
-                  <>
-                    <Text style={styles.atSymbol}>@</Text>
-                    <Input
-                      value={values.username}
-                      onChangeText={handleChange('username')}
-                      onBlur={handleBlur('username')}
-                      placeholder="username"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      autoFocus
-                      onSubmitEditing={() => handleContinue(values, validateField)}
-                      containerStyle={styles.inputWrapper}
-                      style={styles.input}
-                    />
-                  </>
-                ) : (
-                  <Input
+              {step === 'username' ? (
+                <View style={styles.usernameContainer}>
+                  <Text style={styles.atSymbol}>@</Text>
+                  <TextInput
+                    value={values.username}
+                    onChangeText={handleChange('username')}
+                    onBlur={handleBlur('username')}
+                    placeholder="username"
+                    placeholderTextColor={colors.textPlaceholder}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoFocus
+                    onSubmitEditing={() => handleContinue(values, validateField)}
+                    style={styles.usernameInput}
+                  />
+                </View>
+              ) : (
+                <View style={styles.passwordContainer}>
+                  <TextInput
                     value={values.password}
                     onChangeText={handleChange('password')}
                     onBlur={handleBlur('password')}
                     placeholder="Enter your password"
+                    placeholderTextColor={colors.textPlaceholder}
                     secureTextEntry
                     autoCapitalize="none"
                     autoCorrect={false}
                     autoFocus
                     onSubmitEditing={() => handleContinue(values, validateField)}
-                    containerStyle={styles.inputWrapper}
-                    style={styles.input}
+                    style={styles.passwordInput}
                   />
-                )}
-              </View>
+                </View>
+              )}
             </View>
 
             {/* Continue Button */}
@@ -204,13 +205,32 @@ const styles = StyleSheet.create({
     marginTop: 100,
     width: '100%',
   },
+  usernameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary,
+    paddingBottom: spacing.sm,
+    marginTop: 100,
+    width: '100%',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary,
+    paddingBottom: spacing.sm,
+    marginTop: 100,
+    width: '100%',
+  },
   atSymbol: {
     ...typography.body,
     fontSize: 18,
     color: colors.textPrimary,
     fontWeight: '500',
     marginRight: spacing.xs / 2,
-    marginLeft: '35%',
   },
   inputWrapper: {
     flex: 1,
@@ -219,7 +239,24 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 18,
     paddingVertical: spacing.sm,
-    textAlign: 'justify',
+    textAlign: 'center',
+  },
+  usernameInput: {
+    fontSize: 18,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: 0,
+    textAlign: 'left',
+    backgroundColor: 'transparent',
+    color: colors.textPrimary,
+  },
+  passwordInput: {
+    fontSize: 18,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: 0,
+    textAlign: 'center',
+    backgroundColor: 'transparent',
+    color: colors.textPrimary,
+    width: '100%',
   },
   buttonContainer: {
     paddingHorizontal: spacing.xl,
