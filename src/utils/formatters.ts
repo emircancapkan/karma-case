@@ -12,12 +12,18 @@ export const formatDate = (dateString: string): string => {
   
   if (diffInSeconds < 60) {
     return 'just now';
+  } else if (diffInMinutes === 1) {
+    return '1 minute ago';
   } else if (diffInMinutes < 60) {
-    return `${diffInMinutes}m ago`;
+    return `${diffInMinutes} minutes ago`;
+  } else if (diffInHours === 1) {
+    return '1 hour ago';
   } else if (diffInHours < 24) {
-    return `${diffInHours}h ago`;
+    return `${diffInHours} hours ago`;
+  } else if (diffInDays === 1) {
+    return '1 day ago';
   } else if (diffInDays < 7) {
-    return `${diffInDays}d ago`;
+    return `${diffInDays} days ago`;
   } else {
     return date.toLocaleDateString();
   }

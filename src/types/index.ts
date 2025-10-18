@@ -53,6 +53,7 @@ export interface GeneratedImage {
   prompt: string;
   createdAt: string;
   userId?: string;
+  username?: string;
   latitude?: number;
   longitude?: number;
 }
@@ -67,7 +68,7 @@ export interface ImageUploadData {
 export interface ImageFilters {
   latitude?: number;
   longitude?: number;
-  radius?: number;
+  range?: number;
   page?: number;
   limit?: number;
   userId?: string;
@@ -82,13 +83,24 @@ export interface ImageFilters {
 // ============================================
 
 export interface Friend {
-  id: string;
-  username: string;
+  _id?: string;
+  id?: string;
+  user1?: string;
+  user2?: string;
+  username?: string;
+  username1?: string;
+  username2?: string;
   email?: string;
   mail?: string;
   avatar?: string;
+  profilePic?: string;
+  profilePic1?: string;
+  profilePic2?: string;
+  type?: 'friend' | 'request';
   status?: 'pending' | 'accepted' | 'rejected';
   message?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface FriendRequest {

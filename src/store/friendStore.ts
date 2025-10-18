@@ -4,12 +4,14 @@ import type { Friend } from '@/src/types';
 interface FriendState {
   friends: Friend[];
   pendingRequests: Friend[];
+  sentRequests: Friend[];
   isLoading: boolean;
   error: string | null;
   
   // Actions
   setFriends: (friends: Friend[]) => void;
   setPendingRequests: (requests: Friend[]) => void;
+  setSentRequests: (requests: Friend[]) => void;
   addFriend: (friend: Friend) => void;
   removeFriend: (friendId: string) => void;
   acceptRequest: (friendId: string) => void;
@@ -21,6 +23,7 @@ interface FriendState {
 export const useFriendStore = create<FriendState>((set) => ({
   friends: [],
   pendingRequests: [],
+  sentRequests: [],
   isLoading: false,
   error: null,
 
@@ -30,6 +33,10 @@ export const useFriendStore = create<FriendState>((set) => ({
 
   setPendingRequests: (requests) => {
     set({ pendingRequests: requests, error: null });
+  },
+
+  setSentRequests: (requests) => {
+    set({ sentRequests: requests, error: null });
   },
 
   addFriend: (friend) => {

@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { api } from '@/src/api';
 import { useFriendStore } from '@/src/store';
+import { useAuthStore } from '@/src/store';
 import type { Friend } from '@/src/types';
 import { showError, showSuccess } from '@/src/utils/helpers';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/src/config/constants';
 
 export const useFriends = () => {
+  const { user } = useAuthStore();
   const {
     friends,
     pendingRequests,
+    sentRequests,
     isLoading,
     setFriends,
     setPendingRequests,
+    setSentRequests,
     acceptRequest: acceptRequestStore,
     rejectRequest: rejectRequestStore,
     setLoading,
@@ -32,11 +36,31 @@ export const useFriends = () => {
           allFriends = response.data.data;
         }
         
-        const acceptedFriends = allFriends.filter((f) => f.status === 'accepted');
-        const pending = allFriends.filter((f) => f.status === 'pending');
+        const userId = user?.id || user?._id;
         
-        setFriends(acceptedFriends);
-        setPendingRequests(pending);
+        if (userId) {
+          // Filter based on user ID and type
+          const sentRequests = allFriends.filter(f => f.type === "request" && String(f.user1) === String(userId));
+          const receivedRequests = allFriends.filter(f => f.type === "request" && String(f.user2) === String(userId));
+          const friends = allFriends.filter(f => f.type === "friend");
+          
+          // Debug logging
+          console.log('🔍 Sent requests:', sentRequests.length);
+          console.log('🔍 Received requests:', receivedRequests.length);
+          console.log('🔍 Friends:', friends.length);
+          
+          // Set friends, received requests, and sent requests
+          setFriends(friends);
+          setPendingRequests(receivedRequests);
+          setSentRequests(sentRequests);
+        } else {
+          // Fallback to old logic if no user ID
+          const acceptedFriends = allFriends.filter((f) => f.type === 'friend');
+          const pending = allFriends.filter((f) => f.type === 'request');
+          
+          setFriends(acceptedFriends);
+          setPendingRequests(pending);
+        }
         
         return { success: true };
       }
@@ -129,6 +153,7 @@ export const useFriends = () => {
   return {
     friends,
     pendingRequests,
+    sentRequests,
     isLoading,
     fetchFriends,
     sendFriendRequest,

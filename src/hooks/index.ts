@@ -4,4 +4,5 @@ export { useImages } from './useImages';
 export { useFriends } from './useFriends';
 export { useImagePicker } from './useImagePicker';
 export { useLocation } from './useLocation';
+export { useExplore } from './useExplore';
 

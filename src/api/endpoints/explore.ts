@@ -9,7 +9,11 @@ export const exploreEndpoints = {
   explore: (
     filters: ImageFilters
   ): Promise<AxiosResponse<ApiResponse<GeneratedImage[] | PaginatedResponse<GeneratedImage>>>> => {
-    return apiClient.post('/explore', filters);
+    return apiClient.post('/explore', {
+      range: filters.range || 10,
+      latitude: filters.latitude,
+      longitude: filters.longitude,
+    });
   },
 
   /**

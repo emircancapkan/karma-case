@@ -10,7 +10,7 @@ import type { Friend } from '@/src/types';
 
 export const ProfileScreen: React.FC = React.memo(() => {
   const { user } = useAuth();
-  const { friends, pendingRequests, isLoading, fetchFriends, acceptRequest, rejectRequest, removeFriend } = useFriends();
+  const { friends, pendingRequests, sentRequests, isLoading, fetchFriends, acceptRequest, rejectRequest, removeFriend } = useFriends();
   
   const [activeTab, setActiveTab] = useState<'friends' | 'requests'>('requests');
   const [refreshing, setRefreshing] = useState(false);
@@ -24,7 +24,7 @@ export const ProfileScreen: React.FC = React.memo(() => {
     setRefreshing(true);
     await fetchFriends();
     setRefreshing(false);
-  }, [fetchFriends]);
+  }, []);
 
   const handleProfileUpdate = useCallback(() => {
     // Profile updated, user data will be automatically refreshed via Zustand
@@ -33,9 +33,9 @@ export const ProfileScreen: React.FC = React.memo(() => {
   const renderRequestItem: ListRenderItem<Friend> = useCallback(({ item }) => (
     <Card style={styles.requestCard}>
       <View style={styles.requestLeft}>
-        <Avatar name={item.username} size="md" />
+        <Avatar name={item.username1 || item.username} size="md" />
         <View style={styles.requestInfo}>
-          <Text style={styles.requestUsername}>@{item.username}</Text>
+          <Text style={styles.requestUsername}>@{item.username1 || item.username}</Text>
           <Text style={styles.requestMessage}>
             {item.message || 'Wants to add you as a friend'}
           </Text>
@@ -44,13 +44,13 @@ export const ProfileScreen: React.FC = React.memo(() => {
       <View style={styles.requestActions}>
         <Pressable
           style={styles.acceptButton}
-          onPress={() => acceptRequest(item.id)}
+          onPress={() => acceptRequest(item._id || item.id || '')}
         >
           <Ionicons name="checkmark" size={20} color={colors.success} />
         </Pressable>
         <Pressable
           style={styles.rejectButton}
-          onPress={() => rejectRequest(item.id)}
+          onPress={() => rejectRequest(item._id || item.id || '')}
         >
           <Ionicons name="close" size={20} color={colors.error} />
         </Pressable>
@@ -61,9 +61,9 @@ export const ProfileScreen: React.FC = React.memo(() => {
   const renderFriendItem: ListRenderItem<Friend> = useCallback(({ item }) => (
     <Card style={styles.friendCard}>
       <View style={styles.friendLeft}>
-        <Avatar name={item.username} size="md" />
+        <Avatar name={item.username1 || item.username} size="md" />
         <View style={styles.friendInfo}>
-          <Text style={styles.friendUsername}>@{item.username}</Text>
+          <Text style={styles.friendUsername}>@{item.username1 || item.username}</Text>
           {item.email && (
             <Text style={styles.friendStatus}>{item.email}</Text>
           )}
@@ -71,7 +71,7 @@ export const ProfileScreen: React.FC = React.memo(() => {
       </View>
       <Pressable
         style={styles.unfriendButton}
-        onPress={() => removeFriend(item.id)}
+        onPress={() => removeFriend(item._id || item.id || '')}
       >
         <Ionicons name="person-remove" size={20} color={colors.error} />
       </Pressable>
@@ -79,7 +79,7 @@ export const ProfileScreen: React.FC = React.memo(() => {
   ), [removeFriend]);
 
   const keyExtractor = useCallback((item: Friend, index: number) => 
-    item.id || `item-${index}`, 
+    item._id || item.id || `item-${index}`, 
   []);
 
   const renderHeader = useCallback(() => (
@@ -124,11 +124,41 @@ export const ProfileScreen: React.FC = React.memo(() => {
     </>
   ), [user, activeTab]);
 
+  const renderSentRequestItem: ListRenderItem<Friend> = useCallback(({ item }) => (
+    <Card style={styles.requestCard}>
+      <View style={styles.requestLeft}>
+        <Avatar name={item.username2 || item.username} size="md" />
+        <View style={styles.requestInfo}>
+          <Text style={styles.requestUsername}>@{item.username2 || item.username}</Text>
+          <Text style={styles.requestMessage}>
+            Friend request sent
+          </Text>
+        </View>
+      </View>
+      <View style={styles.requestActions}>
+        <Pressable
+          style={styles.cancelButton}
+          onPress={() => removeFriend(item._id || item.id || '')}
+        >
+          <Ionicons name="trash" size={20} color={colors.error} />
+        </Pressable>
+      </View>
+    </Card>
+  ), [removeFriend]);
+
   const renderEmptyRequests = useCallback(() => (
     <EmptyState
       icon="people-outline"
       title="No friend requests"
       message="You don't have any pending friend requests"
+    />
+  ), []);
+
+  const renderEmptySentRequests = useCallback(() => (
+    <EmptyState
+      icon="send-outline"
+      title="No sent requests"
+      message="You haven't sent any friend requests yet"
     />
   ), []);
 
@@ -140,9 +170,48 @@ export const ProfileScreen: React.FC = React.memo(() => {
     />
   ), []);
 
-  const currentData = activeTab === 'requests' ? pendingRequests : friends;
-  const currentRenderItem = activeTab === 'requests' ? renderRequestItem : renderFriendItem;
-  const currentEmpty = activeTab === 'requests' ? renderEmptyRequests : renderEmptyFriends;
+  const getCurrentData = () => {
+    switch (activeTab) {
+      case 'friends':
+        return friends;
+      case 'requests':
+        return [...pendingRequests, ...sentRequests];
+      default:
+        return [];
+    }
+  };
+
+  const getCurrentRenderItem = () => {
+    switch (activeTab) {
+      case 'friends':
+        return renderFriendItem;
+      case 'requests':
+        return (props: any) => {
+          const { item } = props;
+          // Check if this is a sent request (user1 === current user)
+          const userId = user?.id || user?._id;
+          const isSentRequest = item.user1 === userId;
+          return isSentRequest ? renderSentRequestItem(props) : renderRequestItem(props);
+        };
+      default:
+        return renderFriendItem;
+    }
+  };
+
+  const getCurrentEmpty = () => {
+    switch (activeTab) {
+      case 'friends':
+        return renderEmptyFriends;
+      case 'requests':
+        return renderEmptyRequests;
+      default:
+        return renderEmptyFriends;
+    }
+  };
+
+  const currentData = getCurrentData();
+  const currentRenderItem = getCurrentRenderItem();
+  const currentEmpty = getCurrentEmpty();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -317,6 +386,19 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs / 2,
   },
   unfriendButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.errorLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sentStatus: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  cancelButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
