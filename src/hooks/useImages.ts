@@ -19,27 +19,57 @@ export const useImages = () => {
   const fetchImages = async (filters?: ImageFilters) => {
     setLoading(true);
     try {
+      console.log('🔄 Fetching images...');
       const response = await api.image.getImages(filters);
       
-      if (response.data && response.data.data) {
-        const responseData = response.data.data;
-        let imageData: GeneratedImage[] = [];
+      console.log('📦 Full API response:', JSON.stringify(response.data, null, 2));
+      
+      if (response.data) {
+        let rawImages: any[] = [];
         
         // Handle different response formats
-        if (Array.isArray(responseData)) {
-          // Direct array: GeneratedImage[]
-          imageData = responseData;
-        } else if (isPaginatedResponse(responseData)) {
-          // PaginatedResponse: { data: GeneratedImage[], page, limit, total, totalPages }
-          imageData = responseData.data;
+        if (Array.isArray(response.data)) {
+          // Direct array from API: GeneratedImage[]
+          rawImages = response.data;
+          console.log('✅ Received images (direct array):', rawImages.length);
+        } else if (response.data.data) {
+          // Wrapped response: { data: ... }
+          const responseData = response.data.data;
+          
+          if (Array.isArray(responseData)) {
+            // Nested array: { data: GeneratedImage[] }
+            rawImages = responseData;
+            console.log('✅ Received images (nested array format):', rawImages.length);
+          } else if (isPaginatedResponse(responseData)) {
+            // Paginated: { data: { data: GeneratedImage[], page, ... } }
+            rawImages = responseData.data;
+            console.log('✅ Received images (paginated format):', rawImages.length);
+          }
         }
         
+        // Transform MongoDB _id to id and ensure all required fields
+        const imageData: GeneratedImage[] = rawImages.map((img: any) => ({
+          id: img._id || img.id,
+          url: img.url,
+          prompt: img.prompt || '',
+          createdAt: img.createdAt,
+          userId: img.user || img.userId,
+          latitude: img.latitude,
+          longitude: img.longitude,
+        }));
+        
+        console.log('🖼️  Setting images in store:', imageData.length);
         setImages(imageData);
         return { success: true, data: imageData };
       }
       
+      console.log('⚠️  No data in response');
       return { success: false, data: [] };
     } catch (error: any) {
+      console.error('❌ Error fetching images:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      
       // Don't show error for 401 (user might not have images yet)
       if (error.response?.status !== 401) {
         console.error('Error fetching images:', error);
@@ -58,16 +88,26 @@ export const useImages = () => {
       const response = await api.image.upload(formData);
       
       if (response.data) {
-        const newImage = response.data.data;
-        if (newImage) {
-          addImage(newImage);
+        const rawImage: any = response.data.data;
+        if (rawImage) {
+          // Transform MongoDB _id to id before adding to store
+          const transformedImage: GeneratedImage = {
+            id: rawImage._id || rawImage.id,
+            url: rawImage.url,
+            prompt: rawImage.prompt || '',
+            createdAt: rawImage.createdAt,
+            userId: rawImage.user || rawImage.userId,
+            latitude: rawImage.latitude,
+            longitude: rawImage.longitude,
+          };
+          addImage(transformedImage);
         }
         
         // Refresh images list to get updated data
         await fetchImages();
         
         showSuccess(SUCCESS_MESSAGES.imageGenerated);
-        return { success: true, data: newImage };
+        return { success: true, data: rawImage };
       }
       
       return { success: false };

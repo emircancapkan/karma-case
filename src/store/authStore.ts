@@ -34,14 +34,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   login: async (user, token) => {
+    // Import imageStore dynamically to avoid circular dependency
+    const { useImageStore } = await import('./imageStore');
+    const { clearImages } = useImageStore.getState();
+    
     await storage.setAuthToken(token);
     await storage.setUserData(user);
+    clearImages(); // Clear previous user's images before login
     set({ user, isAuthenticated: true });
   },
 
   logout: async () => {
+    // Import imageStore dynamically to avoid circular dependency
+    const { useImageStore } = await import('./imageStore');
+    const { clearImages } = useImageStore.getState();
+    
     await storage.removeAuthToken();
     await storage.removeUserData();
+    clearImages(); // Clear images when logging out
     set({ user: null, isAuthenticated: false });
   },
 

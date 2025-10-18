@@ -39,8 +39,10 @@ export const HomeScreen: React.FC = React.memo(() => {
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    fetchImages();
-  }, []);
+    if (user) {
+      fetchImages();
+    }
+  }, [user?.id]); // Refetch images when user changes
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);

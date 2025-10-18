@@ -31,14 +31,19 @@ const createApiClient = (): AxiosInstance => {
 
         if (!isPublicEndpoint) {
           const token = await AsyncStorage.getItem(STORAGE_KEYS.authToken);
+          console.log('🔑 Token from storage:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
           if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('✅ Authorization header set');
+          } else {
+            console.log('❌ No token or headers available');
           }
         }
 
-        // Debug logging for image upload
-        if (config.url?.includes('/image/upload')) {
+        // Debug logging for image requests
+        if (config.url?.includes('/image')) {
           console.log('🌐 API Request:', config.method?.toUpperCase(), config.url);
+          console.log('🔐 Headers:', config.headers);
           if (config.data instanceof FormData) {
             console.log('📦 FormData being sent to backend');
           }

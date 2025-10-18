@@ -3,6 +3,7 @@ import { View, Text, Animated, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
+import { useAuthStore } from '@/src/store';
 import { colors, spacing, typography, borderRadius } from '@/src/theme';
 import { APP_CONFIG } from '@/src/config/constants';
 import type { RootStackParamList } from '@/src/navigation/types';
@@ -12,6 +13,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Splash'>;
 export const SplashScreen: React.FC = React.memo(() => {
   const navigation = useNavigation<NavigationProp>();
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const { isAuthenticated, isLoading } = useAuthStore();
 
   useEffect(() => {
     // Fade in animation
@@ -21,13 +23,23 @@ export const SplashScreen: React.FC = React.memo(() => {
       useNativeDriver: true,
     }).start();
 
-    // Navigate to welcome screen after 2.5 seconds
-    const timer = setTimeout(() => {
-      navigation.replace('Welcome');
-    }, 2500);
+    // Wait for auth store to finish loading from storage
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        if (isAuthenticated) {
+          // User is logged in, go to main app
+          console.log('✅ User authenticated, navigating to MainTabs');
+          navigation.replace('MainTabs');
+        } else {
+          // User is not logged in, go to welcome
+          console.log('❌ User not authenticated, navigating to Welcome');
+          navigation.replace('Welcome');
+        }
+      }, 2500);
 
-    return () => clearTimeout(timer);
-  }, [fadeAnim, navigation]);
+      return () => clearTimeout(timer);
+    }
+  }, [fadeAnim, navigation, isAuthenticated, isLoading]);
 
   return (
     <View style={styles.container}>
