@@ -83,9 +83,9 @@ export const SignupScreen: React.FC = React.memo(() => {
   const getTitle = useCallback(() => {
     switch (step) {
       case 'username': return 'Enter your username';
-      case 'password': return 'Enter your password';
-      case 'mailVerification': return 'Enter your email';
-      case 'code': return 'Enter verification code: 1234';
+      case 'password': return 'Create a password';
+      case 'mailVerification': return 'We\'ll send you a confirmation code to verify your account';
+      case 'code': return 'Enter the verification code';
       default: return '';
     }
   }, [step]);
@@ -212,21 +212,25 @@ export const SignupScreen: React.FC = React.memo(() => {
 
               {/* Input Field */}
               {step === 'username' ? (
-                <View style={styles.usernameContainer}>
-                  <Text style={styles.atSymbol}>@</Text>
-                  <TextInput
-                    value={values.username}
-                    onChangeText={handleChange('username')}
-                    onBlur={handleBlur('username')}
-                    placeholder="username"
-                    placeholderTextColor={colors.textPlaceholder}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    autoFocus
-                    onSubmitEditing={() => handleContinue(values, validateField)}
-                    style={styles.usernameInput}
-                  />
-                </View>
+                <>
+                  <View style={styles.usernameContainer}>
+                    <Text style={styles.atSymbol}>@</Text>
+                    <TextInput
+                      value={values.username}
+                      onChangeText={handleChange('username')}
+                      onBlur={handleBlur('username')}
+                      placeholder="username"
+                      placeholderTextColor={colors.textPlaceholder}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      autoFocus
+                      onSubmitEditing={() => handleContinue(values, validateField)}
+                      style={styles.usernameInput}
+                    />
+                  </View>
+                  <Text style={styles.disclaimer}>This is how you will look in the app</Text>
+                </>
+                
               ) : step === 'password' ? (
                 <View style={styles.passwordContainer}>
                   <TextInput
@@ -470,6 +474,7 @@ const styles = StyleSheet.create({
     ...typography.h3,
     color: colors.textPrimary,
     marginBottom: spacing['4xl'],
+    textAlign: 'center',
   },
   errorText: {
     ...typography.body,
@@ -495,6 +500,13 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
     marginTop: 100,
     width: '100%',
+    
+  },
+  disclaimer:{
+    ...typography.caption,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginTop: spacing.md,
   },
   passwordContainer: {
     flexDirection: 'row',

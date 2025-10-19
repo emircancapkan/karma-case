@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,10 @@ import {
   Modal,
   TouchableOpacity,
   Dimensions,
-} from 'react-native';
-import Slider from '@react-native-community/slider';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/src/theme';
+} from "react-native";
+import Slider from "@react-native-community/slider";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/src/theme";
 
 interface FilterModalProps {
   visible: boolean;
@@ -18,7 +18,7 @@ interface FilterModalProps {
   currentRange?: number;
 }
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export const FilterModal: React.FC<FilterModalProps> = ({
   visible,
@@ -61,6 +61,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
           {/* Instruction */}
           <View style={styles.instructionContainer}>
+            <Text style={styles.instructionTitle}>Filter</Text>
             <Text style={styles.instruction}>
               Filter to see results close to you
             </Text>
@@ -72,7 +73,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               <Text style={styles.sliderLabel}>0km</Text>
               <Text style={styles.sliderLabel}>100km</Text>
             </View>
-            
+
             <Slider
               style={styles.slider}
               minimumValue={0}
@@ -83,7 +84,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               maximumTrackTintColor={colors.gray300}
               thumbTintColor={colors.primary}
             />
-            
+
             <View style={styles.valueContainer}>
               <Text style={styles.valueText}>{Math.round(range)}km</Text>
             </View>
@@ -106,9 +107,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   modal: {
@@ -124,14 +125,14 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.black,
   },
   closeButton: {
@@ -139,54 +140,60 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     backgroundColor: colors.gray50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   instructionContainer: {
-    backgroundColor: colors.warningLight,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     marginBottom: 24,
+    textAlign: "center",
+  },
+  instructionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 4,
+    textAlign: "center",
   },
   instruction: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     color: colors.black,
-    textAlign: 'center',
+    textAlign: "center",
   },
   sliderContainer: {
     marginBottom: 32,
   },
   sliderLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 16,
   },
   sliderLabel: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     color: colors.gray600,
   },
   slider: {
-    width: '100%',
+    width: "100%",
     height: 40,
     marginVertical: 20,
   },
   valueContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
   },
   valueText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: colors.primary,
   },
   applyButton: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -195,7 +202,7 @@ const styles = StyleSheet.create({
   },
   applyButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: colors.white,
   },
 });

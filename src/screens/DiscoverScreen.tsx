@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { useExplore, useLocation } from '@/src/hooks';
 import { useAuthStore } from '@/src/store';
 import { colors } from '@/src/theme';
-import { MapMarker, FilterModal } from '@/src/components/custom';
+import { MapMarker, FilterModal, FriendRequestModal } from '@/src/components/custom';
 import { api } from '@/src/api';
 import { showSuccess, showError } from '@/src/utils/helpers';
 import { formatUsername } from '@/src/utils/formatters';
@@ -24,6 +24,9 @@ export const DiscoverScreen: React.FC = React.memo(() => {
   const [region, setRegion] = useState(INITIAL_REGION);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [currentRange, setCurrentRange] = useState(10);
+  const [showFriendRequestModal, setShowFriendRequestModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isSendingRequest, setIsSendingRequest] = useState(false);
 
   // Debug images
   console.log('🗺️ Images count:', images.length);
@@ -57,10 +60,6 @@ export const DiscoverScreen: React.FC = React.memo(() => {
     initLocation();
   }, []);
 
-  const handleSettingsPress = () => {
-    // Navigate to settings or open settings modal
-    console.log('Settings pressed');
-  };
 
   const handleFilterPress = () => {
     setShowFilterModal(true);
@@ -79,7 +78,7 @@ export const DiscoverScreen: React.FC = React.memo(() => {
     }
   };
 
-  const handleMarkerPress = async (image: any) => {
+  const handleMarkerPress = useCallback((image: any) => {
     console.log('🎯 Marker pressed for user:', image.username);
     
     // Check if user has userId
@@ -88,34 +87,37 @@ export const DiscoverScreen: React.FC = React.memo(() => {
       return;
     }
 
-    // Show confirmation dialog
-    Alert.alert(
-      'Send Friend Request',
-      `Do you want to send a friend request to ${formatUsername(image.username || 'unknown')}?`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Send Request',
-          onPress: async () => {
-            try {
-              console.log('📤 Sending friend request to:', image.userId);
-              await api.friend.sendRequest({
-                targetUserId: image.userId,
-              });
-              showSuccess(`Friend request sent to ${formatUsername(image.username || 'unknown')}!`);
-            } catch (error: any) {
-              console.error('❌ Error sending friend request:', error);
-              const errorMessage = error?.response?.data?.message || 'Failed to send friend request';
-              showError(errorMessage);
-            }
-          },
-        },
-      ]
-    );
-  };
+    // Set selected user and show modal
+    setSelectedUser(image);
+    setShowFriendRequestModal(true);
+  }, []);
+
+  const handleConfirmFriendRequest = useCallback(async () => {
+    if (!selectedUser) return;
+
+    setIsSendingRequest(true);
+    try {
+      console.log('📤 Sending friend request to:', selectedUser.userId);
+      await api.friend.sendRequest({
+        targetUserId: selectedUser.userId,
+      });
+      showSuccess(`Friend request sent to ${formatUsername(selectedUser.username || 'unknown')}!`);
+      setShowFriendRequestModal(false);
+    } catch (error: any) {
+      console.error('❌ Error sending friend request:', error);
+      const errorMessage = error?.response?.data?.message || 'Failed to send friend request';
+      showError(errorMessage);
+    } finally {
+      setIsSendingRequest(false);
+    }
+  }, [selectedUser]);
+
+  const handleCloseFriendRequestModal = useCallback(() => {
+    if (!isSendingRequest) {
+      setShowFriendRequestModal(false);
+      setSelectedUser(null);
+    }
+  }, [isSendingRequest]);
 
   return (
     <View style={styles.container}>
@@ -142,34 +144,6 @@ export const DiscoverScreen: React.FC = React.memo(() => {
           ))}
       </MapView>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logo}>
-            <Ionicons name="camera" size={24} color={colors.white} />
-          </View>
-          <Text style={styles.logoText}>
-            Karma<Text style={styles.logoAccent}>.AI</Text>
-          </Text>
-        </View>
-
-        <View style={styles.headerRight}>
-          <View style={styles.creditsContainer}>
-            <Ionicons name="images" size={16} color={colors.primary} />
-            <Text style={styles.creditsText}>
-              {user?.credits || 0} <Text style={styles.creditsLabel}>credits</Text>
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={handleSettingsPress}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="settings-outline" size={24} color={colors.gray600} />
-          </TouchableOpacity>
-        </View>
-      </View>
 
       {/* Filter Button */}
       <TouchableOpacity
@@ -194,6 +168,17 @@ export const DiscoverScreen: React.FC = React.memo(() => {
         onApply={handleFilterApply}
         currentRange={currentRange}
       />
+
+      {/* Friend Request Modal */}
+      {selectedUser && (
+        <FriendRequestModal
+          visible={showFriendRequestModal}
+          onClose={handleCloseFriendRequestModal}
+          onConfirm={handleConfirmFriendRequest}
+          username={selectedUser.username || 'unknown'}
+          isLoading={isSendingRequest}
+        />
+      )}
     </View>
   );
 });
@@ -206,78 +191,6 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
-  },
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 60 : 50,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: colors.white,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.black,
-  },
-  logoAccent: {
-    color: colors.primary,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  creditsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.gray50,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
-  },
-  creditsText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.black,
-  },
-  creditsLabel: {
-    fontWeight: '400',
-    color: colors.textSecondary,
-  },
-  settingsButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.gray50,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   filterButton: {
     position: 'absolute',

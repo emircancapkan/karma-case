@@ -65,9 +65,9 @@ export const LoginScreen: React.FC = React.memo(() => {
 
   const isButtonEnabled = useCallback((values: LoginFormValues) => {
     if (step === 'username') {
-      return values.username.trim().length >= APP_CONFIG.minUsernameLength;
+      return values.username.trim().length >= 1;
     } else {
-      return values.password.trim().length >= APP_CONFIG.minPasswordLength;
+      return values.password.trim().length >= 1;
     }
   }, [step]);
 

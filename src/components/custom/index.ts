@@ -4,4 +4,5 @@ export { GeneratingOverlay } from './GeneratingOverlay';
 export { MapMarker } from './MapMarker';
 export { FilterModal } from './FilterModal';
 export { DeleteAccountModal } from './DeleteAccountModal';
+export { FriendRequestModal } from './FriendRequestModal';
 

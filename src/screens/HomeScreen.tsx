@@ -18,7 +18,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth, useImages, useImagePicker, useLocation } from '@/src/hooks';
 import { EmptyState, LoadingSpinner } from '@/src/components/common';
-import { SettingsSheet, GeneratingOverlay } from '@/src/components/custom';
+import { GeneratingOverlay } from '@/src/components/custom';
 import { colors, spacing, typography, borderRadius, shadows } from '@/src/theme';
 import { showError, showSuccess } from '@/src/utils/helpers';
 import { formatCredits } from '@/src/utils/formatters';
@@ -36,7 +36,6 @@ export const HomeScreen: React.FC = React.memo(() => {
   
   const [prompt, setPrompt] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -122,10 +121,6 @@ export const HomeScreen: React.FC = React.memo(() => {
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
 
-      <SettingsSheet
-        visible={showSettings}
-        onClose={() => setShowSettings(false)}
-      />
 
       <GeneratingOverlay visible={isGenerating} />
 
@@ -136,40 +131,6 @@ export const HomeScreen: React.FC = React.memo(() => {
         }
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logoIcon}>
-              <Ionicons name="camera" size={24} color={colors.white} />
-            </View>
-            <Text style={styles.logoText}>
-              {APP_CONFIG.name.split('.')[0]}.<Text style={styles.logoAI}>{APP_CONFIG.name.split('.')[1]}</Text>
-            </Text>
-          </View>
-
-          <View style={styles.headerRight}>
-            <View style={styles.creditsContainer}>
-              {isPremium ? (
-                <>
-                  <Text style={styles.creditIcon}>⭐</Text>
-                  <Text style={styles.premiumText}>Premium</Text>
-                </>
-              ) : (
-                <>
-                  <Text style={styles.creditIcon}>🪙</Text>
-                  <Text style={styles.creditsText}>{formatCredits(credits)}</Text>
-                  <Text style={styles.creditsLabel}>credits</Text>
-                </>
-              )}
-            </View>
-            <Pressable
-              style={styles.settingsButton}
-              onPress={() => setShowSettings(true)}
-            >
-              <Ionicons name="settings-outline" size={24} color={colors.textSecondary} />
-            </Pressable>
-          </View>
-        </View>
 
         {/* Title */}
         <Text style={styles.title}>Create or Edit Photos</Text>
@@ -256,72 +217,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  logoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.lg,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoText: {
-    ...typography.h5,
-    color: colors.textPrimary,
-  },
-  logoAI: {
-    color: colors.primary,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  creditsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.gray100,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius['2xl'],
-    gap: spacing.xs,
-  },
-  creditIcon: {
-    fontSize: 16,
-  },
-  creditsText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  creditsLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  premiumText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  settingsButton: {
-    padding: spacing.xs,
-  },
   title: {
     ...typography.h3,
     color: colors.textPrimary,
     textAlign: 'center',
-    marginTop: spacing.xl,
   },
   subtitle: {
     ...typography.body,
@@ -361,6 +260,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginHorizontal: spacing.xl,
     marginBottom: spacing.md,
+    textAlign: 'center',
   },
   promptInput: {
     marginHorizontal: spacing.xl,
