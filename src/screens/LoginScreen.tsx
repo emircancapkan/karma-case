@@ -8,12 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Formik } from 'formik';
 import { useAuth } from '@/src/hooks';
-import { Input } from '@/src/components/common';
 import { colors, spacing, typography, borderRadius, shadows } from '@/src/theme';
 import type { LoginFormValues, LoginStep } from '@/src/types';
 import { APP_CONFIG } from '@/src/config/constants';
@@ -22,7 +22,7 @@ import { APP_CONFIG } from '@/src/config/constants';
 export const LoginScreen: React.FC = React.memo(() => {
   const { login, isLoading } = useAuth();
   const [step, setStep] = useState<LoginStep>('username');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
 
   const initialValues: LoginFormValues = {
     username: '',
@@ -38,7 +38,6 @@ export const LoginScreen: React.FC = React.memo(() => {
   }, [step]);
 
   const handleContinue = useCallback(async (values: LoginFormValues, validateField: (field: string) => Promise<any>) => {
-    setErrorMessage('');
 
     try {
       if (step === 'username') {
@@ -55,12 +54,12 @@ export const LoginScreen: React.FC = React.memo(() => {
           });
 
           if (!result.success) {
-            setErrorMessage(result.error || 'Login failed');
+            setIsErrorModalVisible(true);
           }
         }
       }
     } catch (error: any) {
-      setErrorMessage(error.message || 'An error occurred');
+      setIsErrorModalVisible(true);
     }
   }, [step, login]);
 
@@ -95,11 +94,6 @@ export const LoginScreen: React.FC = React.memo(() => {
             <View style={styles.content}>
               {/* Title */}
               <Text style={styles.title}>{getTitle()}</Text>
-
-              {/* Error Message */}
-              {errorMessage ? (
-                <Text style={styles.errorText}>{errorMessage}</Text>
-              ) : null}
 
               {/* Input Field */}
               {step === 'username' ? (
@@ -155,6 +149,29 @@ export const LoginScreen: React.FC = React.memo(() => {
                 )}
               </TouchableOpacity>
             </View>
+
+            {/* Error Modal */}
+            <Modal
+              transparent
+              visible={isErrorModalVisible}
+              animationType="fade"
+              onRequestClose={() => setIsErrorModalVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalCard}>
+                  <Text style={styles.modalText}>
+                    Username or password is incorrect, please try again.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    activeOpacity={0.9}
+                    onPress={() => setIsErrorModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>TRY AGAIN</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
           </KeyboardAvoidingView>
         )}
       </Formik>
@@ -189,12 +206,6 @@ const styles = StyleSheet.create({
     ...typography.h3,
     color: colors.textPrimary,
     marginBottom: spacing['4xl'],
-  },
-  errorText: {
-    ...typography.body,
-    color: colors.error,
-    marginBottom: spacing.xl,
-    textAlign: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -280,6 +291,39 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: colors.buttonDisabled,
     opacity: 0.6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  modalCard: {
+    width: '100%',
+    backgroundColor: colors.white,
+    borderRadius: 18,
+    paddingTop: spacing['3xl'],
+    paddingBottom: spacing['2xl'],
+    paddingHorizontal: spacing.xl,
+    ...shadows.primary,
+  },
+  modalText: {
+    ...typography.h4,
+    color: colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
+  },
+  modalButton: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    ...typography.button,
+    color: colors.white,
+    fontWeight: '700',
   },
 });
 

@@ -9,15 +9,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '@/src/hooks';
 import { Input } from '@/src/components/common';
 import { colors, spacing, typography, borderRadius, shadows } from '@/src/theme';
 import type { SignupFormValues, SignupStep } from '@/src/types';
+import type { RootStackParamList } from '@/src/navigation/types';
 import { APP_CONFIG } from '@/src/config/constants';
 import { showSuccess } from '@/src/utils/helpers';
 
@@ -45,10 +49,18 @@ const validationSchemas = {
   }),
 };
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export const SignupScreen: React.FC = React.memo(() => {
+  const navigation = useNavigation<NavigationProp>();
   const { signup, checkUsername, checkEmail, isLoading } = useAuth();
   const [step, setStep] = useState<SignupStep>('username');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isUsernameErrorModalVisible, setIsUsernameErrorModalVisible] = useState(false);
+  const [isPasswordErrorModalVisible, setIsPasswordErrorModalVisible] = useState(false);
+  const [isEmailErrorModalVisible, setIsEmailErrorModalVisible] = useState(false);
+  const [isCodeErrorModalVisible, setIsCodeErrorModalVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const codeInputRef = useRef<TextInput>(null);
 
   const initialValues: SignupFormValues = {
@@ -86,8 +98,18 @@ export const SignupScreen: React.FC = React.memo(() => {
         case 'username':
           await validateField('username');
           if (values.username.trim().length >= APP_CONFIG.minUsernameLength) {
-            await checkUsername(values.username);
-            setStep('password');
+            try {
+              const isAvailable = await checkUsername(values.username);
+              if (isAvailable) {
+                setStep('password');
+              } else {
+                setIsUsernameErrorModalVisible(true);
+              }
+            } catch (e) {
+              setIsUsernameErrorModalVisible(true);
+            }
+          } else {
+            setIsUsernameErrorModalVisible(true);
           }
           break;
 
@@ -95,15 +117,27 @@ export const SignupScreen: React.FC = React.memo(() => {
           await validateField('password');
           if (values.password.trim().length >= APP_CONFIG.minPasswordLength) {
             setStep('mailVerification');
+          } else {
+            setIsPasswordErrorModalVisible(true);
           }
           break;
 
         case 'mailVerification':
           await validateField('mail');
           if (validationSchemas.mailVerification.isValidSync({ mail: values.mail })) {
-            await checkEmail(values.mail);
-            setStep('code');
-            showSuccess('Verification code sent to your email');
+            try {
+              const isAvailable = await checkEmail(values.mail);
+              if (isAvailable) {
+                setStep('code');
+                showSuccess('Verification code sent to your email');
+              } else {
+                setIsEmailErrorModalVisible(true);
+              }
+            } catch (e) {
+              setIsEmailErrorModalVisible(true);
+            }
+          } else {
+            setIsEmailErrorModalVisible(true);
           }
           break;
 
@@ -119,9 +153,11 @@ export const SignupScreen: React.FC = React.memo(() => {
 
             if (!result.success) {
               setErrorMessage(result.error || 'Signup failed');
+            } else {
+              setIsSuccessModalVisible(true);
             }
           } else {
-            setErrorMessage('Invalid verification code');
+            setIsCodeErrorModalVisible(true);
           }
           break;
       }
@@ -133,13 +169,13 @@ export const SignupScreen: React.FC = React.memo(() => {
   const isButtonEnabled = useCallback((values: SignupFormValues) => {
     switch (step) {
       case 'username':
-        return values.username.trim().length >= APP_CONFIG.minUsernameLength;
+        return values.username.trim().length >= 1;
       case 'password':
-        return values.password.trim().length >= APP_CONFIG.minPasswordLength;
+        return values.password.trim().length >= 1;
       case 'mailVerification':
-        return validationSchemas.mailVerification.isValidSync({ mail: values.mail });
+        return values.mail.trim().length >= 1;
       case 'code':
-        return values.code.trim().length === 4;
+        return values.code.trim().length >= 1;
       default:
         return false;
     }
@@ -169,8 +205,8 @@ export const SignupScreen: React.FC = React.memo(() => {
               {/* Title */}
               <Text style={styles.title}>{getTitle()}</Text>
 
-              {/* Error Message */}
-              {errorMessage ? (
+              {/* Error Message (hidden when username, password, email, or code modal is used) */}
+              {step !== 'username' && step !== 'password' && step !== 'mailVerification' && step !== 'code' && errorMessage ? (
                 <Text style={styles.errorText}>{errorMessage}</Text>
               ) : null}
 
@@ -277,6 +313,129 @@ export const SignupScreen: React.FC = React.memo(() => {
                 )}
               </TouchableOpacity>
             </View>
+
+            {/* Username Invalid Modal */}
+            <Modal
+              transparent
+              visible={isUsernameErrorModalVisible}
+              animationType="fade"
+              onRequestClose={() => setIsUsernameErrorModalVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalCard}>
+                  <Text style={styles.modalTitle}>Invalid Username</Text>
+                  <Text style={styles.modalSubtitle}>
+                    Username is already used or contains invalid characters. Please try again.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    activeOpacity={0.9}
+                    onPress={() => setIsUsernameErrorModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>TRY AGAIN</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            {/* Password Invalid Modal */}
+            <Modal
+              transparent
+              visible={isPasswordErrorModalVisible}
+              animationType="fade"
+              onRequestClose={() => setIsPasswordErrorModalVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalCard}>
+                  <Text style={styles.modalTitle}>Invalid Password</Text>
+                  <Text style={styles.modalSubtitle}>
+                    Invalid password, please create a password with at least 6 characters.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    activeOpacity={0.9}
+                    onPress={() => setIsPasswordErrorModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>TRY AGAIN</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            {/* Email Invalid Modal */}
+            <Modal
+              transparent
+              visible={isEmailErrorModalVisible}
+              animationType="fade"
+              onRequestClose={() => setIsEmailErrorModalVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalCard}>
+                  <Text style={styles.modalTitle}>Invalid E-mail Address</Text>
+                  <Text style={styles.modalSubtitle}>
+                    E-mail address is already used or contains invalid characters. Please try again.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    activeOpacity={0.9}
+                    onPress={() => setIsEmailErrorModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>TRY AGAIN</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            {/* Code Invalid Modal */}
+            <Modal
+              transparent
+              visible={isCodeErrorModalVisible}
+              animationType="fade"
+              onRequestClose={() => setIsCodeErrorModalVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalCard}>
+                  <Text style={styles.modalTitle}>Invalid Code</Text>
+                  <Text style={styles.modalSubtitle}>
+                    Verification code is incorrect. Please try again.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    activeOpacity={0.9}
+                    onPress={() => setIsCodeErrorModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>TRY AGAIN</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            {/* Success Modal */}
+            <Modal
+              transparent
+              visible={isSuccessModalVisible}
+              animationType="fade"
+              onRequestClose={() => setIsSuccessModalVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalCard}>
+                  <Text style={styles.modalTitle}>You have successfully registered 🎉</Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    activeOpacity={0.9}
+                    onPress={() => {
+                      setIsSuccessModalVisible(false);
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'MainTabs' }],
+                      });
+                    }}
+                  >
+                    <Text style={styles.modalButtonText}>CONTINUE</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
           </KeyboardAvoidingView>
         )}
       </Formik>
@@ -455,6 +614,45 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: colors.buttonDisabled,
     opacity: 0.6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  modalCard: {
+    width: '100%',
+    backgroundColor: colors.white,
+    borderRadius: 18,
+    paddingTop: spacing['3xl'],
+    paddingBottom: spacing['2xl'],
+    paddingHorizontal: spacing.xl,
+    ...shadows.primary,
+  },
+  modalTitle: {
+    ...typography.h3,
+    textAlign: 'center',
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+  },
+  modalSubtitle: {
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
+  },
+  modalButton: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    ...typography.button,
+    color: colors.white,
+    fontWeight: '700',
   },
 });
 

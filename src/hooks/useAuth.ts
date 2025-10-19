@@ -5,7 +5,7 @@ import { api } from '@/src/api';
 import { useAuthStore } from '@/src/store';
 import type { LoginCredentials, SignupCredentials } from '@/src/types';
 import type { RootStackParamList } from '@/src/navigation/types';
-import { showError, showSuccess } from '@/src/utils/helpers';
+import { showSuccess } from '@/src/utils/helpers';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/src/config/constants';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -30,12 +30,10 @@ export const useAuth = () => {
         });
         return { success: true };
       } else {
-        showError(ERROR_MESSAGES.invalidCredentials);
         return { success: false, error: ERROR_MESSAGES.invalidCredentials };
       }
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || ERROR_MESSAGES.generic;
-      showError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);
@@ -61,19 +59,13 @@ export const useAuth = () => {
         console.log('👤 User data to be stored:', userData);
         
         await login(userData, token);
-        showSuccess(SUCCESS_MESSAGES.signupSuccess);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        });
+        // Don't show success toast or navigate automatically - let the UI handle it
         return { success: true };
       } else {
-        showError(ERROR_MESSAGES.generic);
         return { success: false, error: ERROR_MESSAGES.generic };
       }
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || ERROR_MESSAGES.generic;
-      showError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);
