@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Modal,
   View,
@@ -17,6 +17,7 @@ import { colors, spacing, typography, borderRadius } from '@/src/theme';
 import type { SettingsSheetProps } from '@/src/types';
 import type { RootStackParamList } from '@/src/navigation/types';
 import { APP_CONFIG } from '@/src/config/constants';
+import { DeleteAccountModal } from './DeleteAccountModal';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -60,6 +61,8 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = React.memo(({
   const navigation = useNavigation<NavigationProp>();
   const { user, logout } = useAuth();
   const { deleteAccount } = useUser();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLogOut = useCallback(() => {
     showConfirmation(
@@ -73,18 +76,30 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = React.memo(({
   }, [logout, onClose]);
 
   const handleDeleteAccount = useCallback(() => {
-    showConfirmation(
-      'Delete Account',
-      'Are you sure you want to delete your account? This action cannot be undone.',
-      async () => {
-        const result = await deleteAccount();
-        if (result.success) {
-          await logout();
-          onClose();
-        }
+    setShowDeleteModal(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteAccount();
+      if (result.success) {
+        await logout();
+        onClose();
       }
-    );
+    } catch (error) {
+      console.error('Error deleting account:', error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
   }, [deleteAccount, logout, onClose]);
+
+  const handleCloseDeleteModal = useCallback(() => {
+    if (!isDeleting) {
+      setShowDeleteModal(false);
+    }
+  }, [isDeleting]);
 
   const handleMembershipStatus = useCallback(() => {
     navigation.navigate('Membership');
@@ -189,6 +204,14 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = React.memo(({
           {/* Footer */}
           <Text style={styles.footer}>2025 {APP_CONFIG.name}</Text>
         </ScrollView>
+
+        {/* Delete Account Modal */}
+        <DeleteAccountModal
+          visible={showDeleteModal}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          isLoading={isDeleting}
+        />
       </View>
     </Modal>
   );

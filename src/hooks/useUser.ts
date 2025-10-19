@@ -34,7 +34,6 @@ export const useUser = () => {
     setIsLoading(true);
     try {
       await api.user.delete();
-      showSuccess(SUCCESS_MESSAGES.accountDeleted);
       return { success: true };
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || ERROR_MESSAGES.generic;
