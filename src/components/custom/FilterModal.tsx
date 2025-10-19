@@ -49,7 +49,6 @@ export const FilterModal: React.FC<FilterModalProps> = ({
         <View style={styles.modal}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Filter</Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={handleClose}
@@ -61,7 +60,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 
           {/* Instruction */}
           <View style={styles.instructionContainer}>
-            <Text style={styles.instructionTitle}>Filter</Text>
+            <Text style={styles.title}>Filter</Text>
             <Text style={styles.instruction}>
               Filter to see results close to you
             </Text>
@@ -128,12 +127,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
     color: colors.black,
+    textAlign: "center",
   },
   closeButton: {
     width: 32,
@@ -145,15 +144,14 @@ const styles = StyleSheet.create({
   },
   instructionContainer: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 5,
     borderRadius: 8,
-    marginBottom: 24,
     textAlign: "center",
   },
   instructionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 4,
+    marginBottom: 8,
     textAlign: "center",
   },
   instruction: {
@@ -163,12 +161,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   sliderContainer: {
-    marginBottom: 32,
+    marginBottom: 10,
   },
   sliderLabels: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: -10,
   },
   sliderLabel: {
     fontSize: 14,

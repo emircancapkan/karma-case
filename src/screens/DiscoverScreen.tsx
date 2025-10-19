@@ -1,14 +1,25 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, ActivityIndicator } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { Ionicons } from '@expo/vector-icons';
-import { useExplore, useLocation } from '@/src/hooks';
-import { useAuthStore } from '@/src/store';
-import { colors } from '@/src/theme';
-import { MapMarker, FilterModal, FriendRequestModal } from '@/src/components/custom';
-import { api } from '@/src/api';
-import { showSuccess, showError } from '@/src/utils/helpers';
-import { formatUsername } from '@/src/utils/formatters';
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons";
+import { useExplore, useLocation } from "@/src/hooks";
+import { useAuthStore } from "@/src/store";
+import { colors } from "@/src/theme";
+import {
+  MapMarker,
+  FilterModal,
+  FriendRequestModal,
+} from "@/src/components/custom";
+import { api } from "@/src/api";
+import { showSuccess, showError } from "@/src/utils/helpers";
+import { formatUsername } from "@/src/utils/formatters";
 
 const INITIAL_REGION = {
   latitude: 41.0082,
@@ -29,16 +40,16 @@ export const DiscoverScreen: React.FC = React.memo(() => {
   const [isSendingRequest, setIsSendingRequest] = useState(false);
 
   // Debug images
-  console.log('🗺️ Images count:', images.length);
-  console.log('🗺️ Images data:', images);
+  console.log("🗺️ Images count:", images.length);
+  console.log("🗺️ Images data:", images);
 
   useEffect(() => {
     // Get user's current location
     const initLocation = async () => {
-      console.log('🔍 Getting user location...');
+      console.log("🔍 Getting user location...");
       const userLocation = await getCurrentLocation();
-      console.log('📍 User location:', userLocation);
-      
+      console.log("📍 User location:", userLocation);
+
       if (userLocation) {
         setRegion({
           latitude: userLocation.latitude,
@@ -48,7 +59,7 @@ export const DiscoverScreen: React.FC = React.memo(() => {
         });
 
         // Fetch images near user's location
-        console.log('🌐 Fetching explore images...');
+        console.log("🌐 Fetching explore images...");
         await fetchExploreImages({
           latitude: userLocation.latitude,
           longitude: userLocation.longitude,
@@ -60,15 +71,14 @@ export const DiscoverScreen: React.FC = React.memo(() => {
     initLocation();
   }, []);
 
-
   const handleFilterPress = () => {
     setShowFilterModal(true);
   };
 
   const handleFilterApply = async (range: number) => {
-    console.log('🔍 Applying filter with range:', range);
+    console.log("🔍 Applying filter with range:", range);
     setCurrentRange(range);
-    
+
     if (location) {
       await fetchExploreImages({
         latitude: location.latitude,
@@ -79,11 +89,11 @@ export const DiscoverScreen: React.FC = React.memo(() => {
   };
 
   const handleMarkerPress = useCallback((image: any) => {
-    console.log('🎯 Marker pressed for user:', image.username);
-    
+    console.log("🎯 Marker pressed for user:", image.username);
+
     // Check if user has userId
     if (!image.userId) {
-      showError('User ID not found');
+      showError("User ID not found");
       return;
     }
 
@@ -97,15 +107,20 @@ export const DiscoverScreen: React.FC = React.memo(() => {
 
     setIsSendingRequest(true);
     try {
-      console.log('📤 Sending friend request to:', selectedUser.userId);
+      console.log("📤 Sending friend request to:", selectedUser.userId);
       await api.friend.sendRequest({
         targetUserId: selectedUser.userId,
       });
-      showSuccess(`Friend request sent to ${formatUsername(selectedUser.username || 'unknown')}!`);
+      showSuccess(
+        `Friend request sent to ${formatUsername(
+          selectedUser.username || "unknown"
+        )}!`
+      );
       setShowFriendRequestModal(false);
     } catch (error: any) {
-      console.error('❌ Error sending friend request:', error);
-      const errorMessage = error?.response?.data?.message || 'Failed to send friend request';
+      console.error("❌ Error sending friend request:", error);
+      const errorMessage =
+        error?.response?.data?.message || "Failed to send friend request";
       showError(errorMessage);
     } finally {
       setIsSendingRequest(false);
@@ -127,7 +142,7 @@ export const DiscoverScreen: React.FC = React.memo(() => {
         initialRegion={region}
         showsUserLocation
         showsMyLocationButton={false}
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+        provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
       >
         {images
           .filter((image) => image.latitude && image.longitude)
@@ -144,14 +159,13 @@ export const DiscoverScreen: React.FC = React.memo(() => {
           ))}
       </MapView>
 
-
       {/* Filter Button */}
       <TouchableOpacity
         style={styles.filterButton}
         onPress={handleFilterPress}
         activeOpacity={0.7}
       >
-        <Ionicons name="options" size={24} color={colors.primary} />
+        <Ionicons name="filter" size={24} color={colors.primary} />
       </TouchableOpacity>
 
       {/* Loading Overlay */}
@@ -175,7 +189,7 @@ export const DiscoverScreen: React.FC = React.memo(() => {
           visible={showFriendRequestModal}
           onClose={handleCloseFriendRequestModal}
           onConfirm={handleConfirmFriendRequest}
-          username={selectedUser.username || 'unknown'}
+          username={selectedUser.username || "unknown"}
           isLoading={isSendingRequest}
         />
       )}
@@ -183,7 +197,7 @@ export const DiscoverScreen: React.FC = React.memo(() => {
   );
 });
 
-DiscoverScreen.displayName = 'DiscoverScreen';
+DiscoverScreen.displayName = "DiscoverScreen";
 
 const styles = StyleSheet.create({
   container: {
@@ -193,15 +207,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filterButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 100,
     left: 20,
     width: 56,
     height: 56,
     borderRadius: 28,
     backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -210,8 +224,8 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

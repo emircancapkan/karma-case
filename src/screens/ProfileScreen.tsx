@@ -73,7 +73,7 @@ export const ProfileScreen: React.FC = React.memo(() => {
         style={styles.unfriendButton}
         onPress={() => removeFriend(item._id || item.id || '')}
       >
-        <Ionicons name="person-remove" size={20} color={colors.error} />
+        <Ionicons name="trash" size={20} color={colors.black} />
       </Pressable>
     </Card>
   ), [removeFriend]);
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   editButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 15,
     backgroundColor: colors.gray100,
     justifyContent: 'center',
     alignItems: 'center',
@@ -302,6 +302,7 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     backgroundColor: colors.white,
+    
   },
   tabText: {
     ...typography.body,
@@ -389,7 +390,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.errorLight,
+    backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
   },

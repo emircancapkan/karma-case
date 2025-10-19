@@ -118,7 +118,7 @@ export const HomeScreen: React.FC = React.memo(() => {
   const isButtonDisabled = !selectedImage || !prompt.trim() || isGenerating;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="dark" />
 
 
@@ -206,7 +206,7 @@ export const HomeScreen: React.FC = React.memo(() => {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 });
 

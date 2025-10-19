@@ -196,7 +196,6 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = React.memo(({
                 icon="trash-outline"
                 title="Delete Account"
                 onPress={handleDeleteAccount}
-                iconColor={colors.error}
               />
             </View>
           </View>
