@@ -25,7 +25,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({ onSettingsPress }) => {
   const credits = user?.credits ?? 0;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView style={styles.safeArea} edges={["top",]}>
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Image

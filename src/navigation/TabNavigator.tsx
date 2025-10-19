@@ -62,6 +62,7 @@ export const TabNavigator: React.FC = () => {
           name="Discover"
           options={{
             title: "Discover",
+            headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "grid" : "grid-outline"}
