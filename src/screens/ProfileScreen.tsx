@@ -142,8 +142,6 @@ export const ProfileScreen: React.FC = React.memo(() => {
           {/* Profile Info */}
           <View style={styles.profileInfoContainer}>
             <Avatar 
-              name={user?.username} 
-              imageUri={user?.avatar} 
               size="xl" 
             />
             <View style={styles.userDetails}>
