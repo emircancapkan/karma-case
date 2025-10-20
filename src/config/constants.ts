@@ -29,12 +29,12 @@ export const APP_CONFIG = {
 
   // Verification
   verificationCodeLength: 4,
-  verificationCodeStatic: "1234", // For demo purposes
+  verificationCodeStatic: "1234",
 
   // URLs
   privacyPolicyUrl: "https://www.google.com",
   termsOfServiceUrl: "https://www.google.com",
-  supportEmail: "support@karmaai.com",
+  contactUs: "https://gokarma.app",
 } as const;
 
 export const STORAGE_KEYS = {

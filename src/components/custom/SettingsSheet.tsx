@@ -156,7 +156,7 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = React.memo(({
               <SettingsItem
                 icon="information-circle-outline"
                 title="Contact us"
-                onPress={() => {}}
+                onPress={() => handleOpenLink(APP_CONFIG.contactUs)}
               />
               <SettingsItem
                 icon="heart-circle-outline"
