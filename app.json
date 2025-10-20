@@ -24,7 +24,7 @@
       "package": "com.anonymous.karmacase",
       "config": {
         "googleMaps": {
-          "apiKey": ""
+          "apiKey": "$EXPO_PUBLIC_GOOGLE_MAPS_API_KEY"
         }
       }
     },
