@@ -10,6 +10,7 @@ interface AuthState {
   // Actions
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
+  decrementCredits: () => void;
   logout: () => void;
   login: (user: User, token: string) => Promise<void>;
   loadUserFromStorage: () => Promise<void>;
@@ -28,6 +29,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     set((state) => {
       if (!state.user) return state;
       const updatedUser = { ...state.user, ...updates };
+      storage.setUserData(updatedUser); // Persist to storage
+      return { user: updatedUser };
+    });
+  },
+
+  decrementCredits: () => {
+    set((state) => {
+      if (!state.user || state.user.isPremium) return state;
+      const newCredits = Math.max(0, (state.user.credits || 0) - 1);
+      const updatedUser = { ...state.user, credits: newCredits };
       storage.setUserData(updatedUser); // Persist to storage
       return { user: updatedUser };
     });

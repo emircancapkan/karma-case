@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { api } from '@/src/api';
 import { useImageStore } from '@/src/store';
 import { useAuthStore } from '@/src/store';
 import type { ImageFilters, GeneratedImage, PaginatedResponse } from '@/src/types';
+import type { RootStackParamList } from '@/src/navigation/types';
 import { showError, showSuccess } from '@/src/utils/helpers';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/src/config/constants';
 
@@ -11,9 +14,12 @@ const isPaginatedResponse = (data: any): data is PaginatedResponse<GeneratedImag
   return data && typeof data === 'object' && 'data' in data && Array.isArray(data.data);
 };
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export const useImages = () => {
+  const navigation = useNavigation<NavigationProp>();
   const { images, isLoading, setImages, addImage, setLoading, setError } = useImageStore();
-  const { updateUser } = useAuthStore();
+  const { decrementCredits } = useAuthStore();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const fetchImages = async (filters?: ImageFilters) => {
@@ -102,6 +108,9 @@ export const useImages = () => {
           };
           addImage(transformedImage);
         }
+        
+        // Decrement credits after successful generation
+        decrementCredits();
         
         // Refresh images list to get updated data
         await fetchImages();

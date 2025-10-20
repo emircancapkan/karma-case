@@ -12,7 +12,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const useAuth = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { user, isAuthenticated, login, logout, updateUser } = useAuthStore();
+  const { user, isAuthenticated, login, logout, updateUser, decrementCredits } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (credentials: LoginCredentials) => {
@@ -112,6 +112,7 @@ export const useAuth = () => {
     checkUsername,
     checkEmail,
     updateUser,
+    decrementCredits,
   };
 };
 

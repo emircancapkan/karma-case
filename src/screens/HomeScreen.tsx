@@ -11,7 +11,6 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -20,9 +19,8 @@ import { useAuth, useImages, useImagePicker, useLocation } from '@/src/hooks';
 import { EmptyState, LoadingSpinner } from '@/src/components/common';
 import { GeneratingOverlay } from '@/src/components/custom';
 import { colors, spacing, typography, borderRadius, shadows } from '@/src/theme';
-import { showError, showSuccess } from '@/src/utils/helpers';
-import { formatCredits } from '@/src/utils/formatters';
-import { ERROR_MESSAGES, APP_CONFIG } from '@/src/config/constants';
+import { showError } from '@/src/utils/helpers';
+import { ERROR_MESSAGES } from '@/src/config/constants';
 import type { RootStackParamList } from '@/src/navigation/types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -105,6 +103,12 @@ export const HomeScreen: React.FC = React.memo(() => {
       clearImage();
       setPrompt('');
       
+      // Check if user has 0 credits after generation and redirect to Membership
+      if (!user?.isPremium && (user?.credits ?? 0) <= 1) {
+        navigation.navigate('Membership');
+        return;
+      }
+      
       // Navigate to Result screen
       navigation.navigate('Result', {
         imageUrl: result.data.url,
@@ -114,7 +118,6 @@ export const HomeScreen: React.FC = React.memo(() => {
   }, [selectedImage, prompt, user, getCurrentLocation, generateImage, clearImage, navigation]);
 
   const isPremium = user?.isPremium ?? false;
-  const credits = user?.credits ?? 0;
   const isButtonDisabled = !selectedImage || !prompt.trim() || isGenerating;
 
   return (
