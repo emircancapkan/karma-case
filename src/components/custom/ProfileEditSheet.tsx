@@ -99,7 +99,7 @@ export const ProfileEditSheet: React.FC<ProfileEditSheetProps> = React.memo(({
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Profile Avatar */}
           <View style={styles.avatarContainer}>
-            <Avatar name={username} size="2xl" />
+            <Avatar size="2xl" />
           </View>
 
           {/* Form */}
