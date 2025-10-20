@@ -59,7 +59,6 @@ export const useAuth = () => {
         console.log('👤 User data to be stored:', userData);
         
         await login(userData, token);
-        // Don't show success toast or navigate automatically - let the UI handle it
         return { success: true };
       } else {
         return { success: false, error: ERROR_MESSAGES.generic };

@@ -32,7 +32,7 @@ export const AppNavigator: React.FC = () => {
   const colorScheme = useColorScheme();
   const loadUserFromStorage = useAuthStore((state) => state.loadUserFromStorage);
 
-  // Load user data from AsyncStorage on app start
+  // Load user data on app start
   useEffect(() => {
     loadUserFromStorage();
   }, [loadUserFromStorage]);

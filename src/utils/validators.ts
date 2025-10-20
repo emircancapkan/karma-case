@@ -1,16 +1,12 @@
 import { APP_CONFIG } from '@/src/config/constants';
 
-/**
- * Validate email format
- */
+
 export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
 
-/**
- * Validate username
- */
+
 export const isValidUsername = (username: string): boolean => {
   if (!username || username.trim().length < APP_CONFIG.minUsernameLength) {
     return false;
@@ -20,14 +16,11 @@ export const isValidUsername = (username: string): boolean => {
     return false;
   }
   
-  // Username should only contain alphanumeric characters and underscores
   const usernameRegex = /^[a-zA-Z0-9_]+$/;
   return usernameRegex.test(username);
 };
 
-/**
- * Validate password strength
- */
+
 export const isValidPassword = (password: string): boolean => {
   if (password && password.length >= APP_CONFIG.minPasswordLength) {
     return true;
@@ -35,9 +28,7 @@ export const isValidPassword = (password: string): boolean => {
   return false;
 };
 
-/**
- * Validate verification code
- */
+
 export const isValidVerificationCode = (code: string): boolean => {
   if (code && code.length === APP_CONFIG.verificationCodeLength && /^\d+$/.test(code)) {
     return true;
@@ -45,9 +36,7 @@ export const isValidVerificationCode = (code: string): boolean => {
   return false;
 };
 
-/**
- * Validate image file
- */
+
 export const isValidImageFile = (fileType: string, fileSize: number): { valid: boolean; error?: string } => {
   const allowedTypes = APP_CONFIG.allowedImageTypes as readonly string[];
   
@@ -68,9 +57,7 @@ export const isValidImageFile = (fileType: string, fileSize: number): { valid: b
   return { valid: true };
 };
 
-/**
- * Validate coordinates
- */
+
 export const isValidCoordinates = (latitude: number, longitude: number): boolean => {
   return (
     latitude >= -90 &&
@@ -80,9 +67,7 @@ export const isValidCoordinates = (latitude: number, longitude: number): boolean
   );
 };
 
-/**
- * Get validation error message
- */
+
 export const getValidationError = (field: string, value: string): string | null => {
   switch (field) {
     case 'username':

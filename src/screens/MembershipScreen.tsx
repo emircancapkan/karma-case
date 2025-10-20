@@ -44,7 +44,6 @@ export const MembershipScreen: React.FC = React.memo(() => {
   }, []);
 
   const handleRestorePurchase = useCallback(() => {
-    // Implement restore purchase logic
     showError('Restore purchase.');
   }, []);
 

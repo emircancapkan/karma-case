@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiUrl } from '@/src/config';
 import { STORAGE_KEYS } from '@/src/config/constants';
 
-// Create axios instance with default config
+// Create axios
 const createApiClient = (): AxiosInstance => {
   const client = axios.create({
     baseURL: apiUrl,
@@ -13,7 +13,7 @@ const createApiClient = (): AxiosInstance => {
     },
   });
 
-  // Request interceptor - Add auth token
+  // Add auth token
   client.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       try {
@@ -40,7 +40,7 @@ const createApiClient = (): AxiosInstance => {
           }
         }
 
-        // Debug logging for image requests
+        // Debug image
         if (config.url?.includes('/image')) {
           console.log('🌐 API Request:', config.method?.toUpperCase(), config.url);
           console.log('🔐 Headers:', config.headers);
@@ -57,7 +57,7 @@ const createApiClient = (): AxiosInstance => {
     (error) => Promise.reject(error)
   );
 
-  // Response interceptor - Handle errors globally
+  // errors
   client.interceptors.response.use(
     (response) => {
       // Debug logging for image upload response

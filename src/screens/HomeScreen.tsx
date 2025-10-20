@@ -72,7 +72,6 @@ export const HomeScreen: React.FC = React.memo(() => {
     const match = /\.(\w+)$/.exec(filename);
     const extension = match ? match[1].toLowerCase() : 'jpeg';
 
-    // Map extension to mime type (type-safe)
     const mimeTypes: Record<string, 'image/jpeg' | 'image/jpg' | 'image/png'> = {
       jpg: 'image/jpeg',
       jpeg: 'image/jpeg',
@@ -91,11 +90,10 @@ export const HomeScreen: React.FC = React.memo(() => {
     formData.append('longitude', location.longitude.toString());
     formData.append('prompt', prompt);
 
-    // Debug: Log the data being sent
-    console.log('🚀 Generating image with:');
-    console.log('  📸 Image:', filename);
-    console.log('  📍 Location:', location);
-    console.log('  ✍️  Prompt:', prompt);
+    console.log('Generating image with:');
+    console.log('Image:', filename);
+    console.log('Location:', location);
+    console.log('Prompt:', prompt);
 
     const result = await generateImage(formData);
 
@@ -103,7 +101,6 @@ export const HomeScreen: React.FC = React.memo(() => {
       clearImage();
       setPrompt('');
       
-      // Check if user has 0 credits after generation and redirect to Membership
       if (!user?.isPremium && (user?.credits ?? 0) <= 1) {
         navigation.navigate('Membership');
         return;

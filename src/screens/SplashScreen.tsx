@@ -16,22 +16,18 @@ export const SplashScreen: React.FC = React.memo(() => {
   const { isAuthenticated, isLoading } = useAuthStore();
 
   useEffect(() => {
-    // Fade in animation
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
       useNativeDriver: true,
     }).start();
 
-    // Wait for auth store to finish loading from storage
     if (!isLoading) {
       const timer = setTimeout(() => {
         if (isAuthenticated) {
-          // User is logged in, go to main app
           console.log('✅ User authenticated, navigating to MainTabs');
           navigation.replace('MainTabs');
         } else {
-          // User is not logged in, go to welcome
           console.log('❌ User not authenticated, navigating to Welcome');
           navigation.replace('Welcome');
         }

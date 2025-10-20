@@ -8,7 +8,6 @@ interface FriendState {
   isLoading: boolean;
   error: string | null;
   
-  // Actions
   setFriends: (friends: Friend[]) => void;
   setPendingRequests: (requests: Friend[]) => void;
   setSentRequests: (requests: Friend[]) => void;

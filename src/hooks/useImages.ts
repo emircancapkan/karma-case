@@ -9,7 +9,6 @@ import type { RootStackParamList } from '@/src/navigation/types';
 import { showError, showSuccess } from '@/src/utils/helpers';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/src/config/constants';
 
-// Type guard to check if response is PaginatedResponse
 const isPaginatedResponse = (data: any): data is PaginatedResponse<GeneratedImage> => {
   return data && typeof data === 'object' && 'data' in data && Array.isArray(data.data);
 };
@@ -35,25 +34,20 @@ export const useImages = () => {
         
         // Handle different response formats
         if (Array.isArray(response.data)) {
-          // Direct array from API: GeneratedImage[]
           rawImages = response.data;
           console.log('✅ Received images (direct array):', rawImages.length);
         } else if (response.data.data) {
-          // Wrapped response: { data: ... }
           const responseData = response.data.data;
           
           if (Array.isArray(responseData)) {
-            // Nested array: { data: GeneratedImage[] }
             rawImages = responseData;
             console.log('✅ Received images (nested array format):', rawImages.length);
           } else if (isPaginatedResponse(responseData)) {
-            // Paginated: { data: { data: GeneratedImage[], page, ... } }
             rawImages = responseData.data;
             console.log('✅ Received images (paginated format):', rawImages.length);
           }
         }
         
-        // Transform MongoDB _id to id and ensure all required fields
         const imageData: GeneratedImage[] = rawImages.map((img: any) => ({
           id: img._id || img.id,
           url: img.url,
@@ -76,7 +70,6 @@ export const useImages = () => {
       console.error('❌ Error response:', error.response?.data);
       console.error('❌ Error status:', error.response?.status);
       
-      // Don't show error for 401 (user might not have images yet)
       if (error.response?.status !== 401) {
         console.error('Error fetching images:', error);
         setError(error.response?.data?.message || ERROR_MESSAGES.generic);
@@ -96,7 +89,7 @@ export const useImages = () => {
       if (response.data) {
         const rawImage: any = response.data.data;
         if (rawImage) {
-          // Transform MongoDB _id to id before adding to store
+
           const transformedImage: GeneratedImage = {
             id: rawImage._id || rawImage.id,
             url: rawImage.url,
@@ -109,10 +102,9 @@ export const useImages = () => {
           addImage(transformedImage);
         }
         
-        // Decrement credits after successful generation
+        // Decrement credits 
         decrementCredits();
         
-        // Refresh images list to get updated data
         await fetchImages();
         
         showSuccess(SUCCESS_MESSAGES.imageGenerated);

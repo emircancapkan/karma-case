@@ -12,7 +12,6 @@ export const GeneratingOverlay: React.FC<GeneratingOverlayProps> = ({ visible })
 
   useEffect(() => {
     if (visible) {
-      // Animate dots ...
       Animated.loop(
         Animated.sequence([
           Animated.timing(dotsAnimation, {

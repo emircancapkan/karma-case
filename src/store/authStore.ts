@@ -7,7 +7,6 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   
-  // Actions
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
   decrementCredits: () => void;
@@ -39,19 +38,18 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (!state.user || state.user.isPremium) return state;
       const newCredits = Math.max(0, (state.user.credits || 0) - 1);
       const updatedUser = { ...state.user, credits: newCredits };
-      storage.setUserData(updatedUser); // Persist to storage
+      storage.setUserData(updatedUser); 
       return { user: updatedUser };
     });
   },
 
   login: async (user, token) => {
-    // Import imageStore dynamically to avoid circular dependency
     const { useImageStore } = await import('./imageStore');
     const { clearImages } = useImageStore.getState();
     
     await storage.setAuthToken(token);
     await storage.setUserData(user);
-    clearImages(); // Clear previous user's images before login
+    clearImages(); 
     set({ user, isAuthenticated: true });
   },
 
@@ -62,7 +60,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     
     await storage.removeAuthToken();
     await storage.removeUserData();
-    clearImages(); // Clear images when logging out
+    clearImages(); 
     set({ user: null, isAuthenticated: false });
   },
 

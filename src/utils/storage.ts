@@ -2,9 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '@/src/config/constants';
 import type { User } from '@/src/types';
 
-/**
- * Storage utility for managing AsyncStorage operations
- */
 
 export const storage = {
   // Auth Token

@@ -16,6 +16,6 @@ export const api = {
 // Export individual endpoints for convenience
 export { authEndpoints, userEndpoints, imageEndpoints, friendEndpoints, exploreEndpoints };
 
-// Export client for custom requests if needed
+// Export client for custom requests
 export { apiClient } from './client';
 

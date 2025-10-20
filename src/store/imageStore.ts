@@ -6,7 +6,6 @@ interface ImageState {
   isLoading: boolean;
   error: string | null;
   
-  // Actions
   setImages: (images: GeneratedImage[]) => void;
   addImage: (image: GeneratedImage) => void;
   removeImage: (imageId: string) => void;

@@ -46,7 +46,6 @@ export const ResultScreen: React.FC = () => {
         return;
       }
 
-      // Download the image using XMLHttpRequest (React Native compatible)
       const file = new File(Paths.cache, `${imageId}.jpg`);
       
       // Download binary data using XMLHttpRequest
@@ -99,8 +98,7 @@ export const ResultScreen: React.FC = () => {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            // TODO: Implement delete API call
-            navigation.goBack();
+            navigation.goBack(); //not available yet in backend as i see in swagger
           },
         },
       ]

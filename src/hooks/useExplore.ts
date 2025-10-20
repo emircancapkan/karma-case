@@ -36,11 +36,10 @@ export const useExplore = (initialFilters?: ImageFilters): UseExploreResult => {
         
         console.log('📸 Raw image data:', imageData);
         
-        // Map _id to id if needed and ensure userId is available
         const mappedImages = imageData.map((img: any) => ({
           ...img,
           id: img.id || img._id,
-          userId: img.userId || img.user || img._id, // Use user field from API response
+          userId: img.userId || img.user || img._id, 
         }));
         
         console.log('📸 Mapped images:', mappedImages);

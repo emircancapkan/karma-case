@@ -23,21 +23,20 @@ export const authEndpoints = {
   },
 
   /**
-   * Check username availability
+   * Check username 
    */
   checkUsername: (username: string): Promise<AxiosResponse<ApiResponse<boolean>>> => {
     return apiClient.post('/auth/check-username', { username });
   },
 
-  /**
-   * Check email availability and send verification code
+  /* Check email and send verification code
    */
   checkMail: (mail: string): Promise<AxiosResponse<ApiResponse<boolean>>> => {
     return apiClient.post('/auth/check-mail', { mail });
   },
 
   /**
-   * Logout user (if backend supports it)
+   * Logout
    */
   logout: (): Promise<AxiosResponse<ApiResponse>> => {
     return apiClient.post('/auth/logout');

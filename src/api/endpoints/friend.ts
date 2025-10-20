@@ -30,12 +30,6 @@ export const friendEndpoints = {
   deleteFriend: (data: FriendActionRequest): Promise<AxiosResponse<ApiResponse>> => {
     return apiClient.delete('/friend/delete', { data });
   },
-
-  /**
-   * Get pending friend requests
-   */
-  getPendingRequests: (): Promise<AxiosResponse<ApiResponse<Friend[]>>> => {
-    return apiClient.get('/friend/pending');
-  },
+  
 };
 

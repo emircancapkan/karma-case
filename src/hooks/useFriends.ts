@@ -49,12 +49,10 @@ export const useFriends = () => {
           console.log('🔍 Received requests:', receivedRequests.length);
           console.log('🔍 Friends:', friends.length);
           
-          // Set friends, received requests, and sent requests
           setFriends(friends);
           setPendingRequests(receivedRequests);
           setSentRequests(sentRequests);
         } else {
-          // Fallback to old logic if no user ID
           const acceptedFriends = allFriends.filter((f) => f.type === 'friend');
           const pending = allFriends.filter((f) => f.type === 'request');
           
@@ -120,7 +118,7 @@ export const useFriends = () => {
       if (response.data.success) {
         rejectRequestStore(friendId);
         showSuccess(SUCCESS_MESSAGES.friendRequestRejected);
-        await fetchFriends(); // Refresh list
+        await fetchFriends(); 
         return { success: true };
       }
       
@@ -137,7 +135,7 @@ export const useFriends = () => {
       const response = await api.friend.deleteFriend({ friendId });
       
       if (response.data.success) {
-        await fetchFriends(); // Refresh list
+        await fetchFriends(); 
         showSuccess('Friend removed');
         return { success: true };
       }

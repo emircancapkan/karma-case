@@ -26,20 +26,7 @@ export const imageEndpoints = {
     params?: ImageFilters
   ): Promise<AxiosResponse<ApiResponse<GeneratedImage[] | PaginatedResponse<GeneratedImage>>>> => {
     return apiClient.get('/image', { params });
-  },
-
-  /**
-   * Get single image by ID
-   */
-  getImageById: (id: string): Promise<AxiosResponse<ApiResponse<GeneratedImage>>> => {
-    return apiClient.get(`/image/${id}`);
-  },
-
-  /**
-   * Delete image
-   */
-  deleteImage: (id: string): Promise<AxiosResponse<ApiResponse>> => {
-    return apiClient.delete(`/image/${id}`);
-  },
+  }
+  
 };
 
