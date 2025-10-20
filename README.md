@@ -1,6 +1,6 @@
-# Karma Case
+# KarmaAI
 
-Karma Case, React Native ve Expo kullanılarak geliştirilmiş bir mobil uygulamadır. Uygulama, kullanıcıların konum tabanlı içerik paylaşımı yapmasına olanak sağlar.
+KarmaAI, React Native ve Expo kullanılarak geliştirilmiş bir mobil uygulamadır. Uygulama, kullanıcıların konum tabanlı içerik paylaşımı yapmasına olanak sağlar.
 
 ## 🚀 Özellikler
 
