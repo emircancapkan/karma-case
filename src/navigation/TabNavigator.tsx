@@ -28,7 +28,7 @@ export const TabNavigator: React.FC = () => {
             borderTopWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
-            height: Platform.OS === "ios" ? 88 : 60,
+            height: Platform.OS === "ios" ? 88 : 80,
             paddingBottom: Platform.OS === "ios" ? spacing["2xl"] : spacing.sm,
             paddingTop: spacing.sm,
           },
