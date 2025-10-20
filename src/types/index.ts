@@ -130,24 +130,6 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// ============================================
-// NAVIGATION TYPES
-// ============================================
-
-export type RootStackParamList = {
-  index: undefined;
-  welcome: undefined;
-  login: undefined;
-  signup: undefined;
-  membershipScreen: undefined;
-  '(tabs)': undefined;
-};
-
-export type TabParamList = {
-  index: undefined;
-  discoverScreen: undefined;
-  profileScreen: undefined;
-};
 
 // ============================================
 // COMPONENT PROP TYPES
